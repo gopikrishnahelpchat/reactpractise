@@ -1,0 +1,69 @@
+<html>
+<head>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+
+</head>
+
+<body>
+
+<div id='main'>
+</div>
+
+</body>
+
+<script type="text/babel">
+
+var HelloReact=React.createClass({
+	render: function()
+	{
+		return (
+			<h1>{this.props.message}</h1>
+		);
+	},
+});
+
+var EchoReact = React.createClass({
+	
+	getInitialState: function()
+	{
+		return {
+		message : 'default'
+		}
+	},
+
+	componentDidMount: function()
+	{
+		console.log('componentDidMount');
+	},
+
+
+	onUpdateClick: function()
+	{
+		this.setState({
+			message: this.refs.messageTextBox.value
+		});
+	},
+
+	render: function()
+	{
+		return (
+		<div>
+			<HelloReact message="Hello React" />
+			<input type="text" ref="messageTextBox" />
+			<button onClick = {this.onUpdateClick}>Update</button>
+			<div>{this.state.message}</div>
+		</div>
+		);
+	}
+
+});
+
+ReactDOM.render(<EchoReact /> , document.getElementById('main'));
+
+</script>
+
+</html>

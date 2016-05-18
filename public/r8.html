@@ -1,0 +1,77 @@
+<html>
+<head>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.0.2/react-dom.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+
+</head>
+
+<body>
+
+<div id='main'>
+</div>
+
+</body>
+
+<script type="text/babel">
+
+var UserRow = React.createClass({
+		render: function()
+		{
+			return (
+				<tr>
+					<td>{this.props.user.userName}</td>
+					<td><a href={'mailto:' + this.props.user.email}>{this.props.user.email}</a></td>
+				</tr>
+			);
+		}
+});
+
+var UserList = React.createClass({
+	
+	getInitialState: function()
+	{
+		return {
+			users: [
+				{
+					id: 1,
+					userName: 'Madhur',
+					email: 'ahuja.madhur@gmail.com'
+				}
+				
+			]
+		}
+	},
+
+	render: function()
+	{
+		var users = this.state.users.map(
+			function(user)
+			{
+				return (<UserRow user = {user} key = {user.id} />);
+			}
+		);
+		console.log(users);
+
+		return (
+			<table>
+				<tr>
+					<th>User Name</th>
+					<th>Email</th>
+				</tr>
+				{ users }
+			</table>
+		);
+	}
+});
+
+ReactDOM.render(<UserList /> , document.getElementById('main'));
+
+</script>
+
+</html>
