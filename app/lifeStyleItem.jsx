@@ -11,16 +11,17 @@ var LifeStyleItem = React.createClass({
     render: function () {
         return (
           <div>
-              <img src="" height="40px" style="margin-bottom:10px;"/>
+              <img src="" height="40px" style={{"margin":"10px;"}}/>
               <h1 >
-                  First Title
+                  {this.props.item.author}
               </h1>
               <div>
                   Second para
               </div>
-              <div style="margin-top:10px;">
+              <div >
                   Total Views : 100
               </div>
+              
           </div>
 
         );

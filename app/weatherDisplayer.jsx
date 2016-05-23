@@ -1,69 +1,78 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var axios = require('axios');
-var WeatherForm = require('./weatherForm.jsx');
-var WeatherDisplay = require('./weatherDisplay.jsx');
-//var TABS = require('./tabs.jsx');
+var TABS = require('./tabs.jsx');
+var UTILS = require('./utils.jsx');
 
-//var {Route, Router, IndexRoute, hashHistory} = require('react-router');
-
-// Load foundation
 require('style!css!bootstrap/dist/css/bootstrap.min.css');
+require('style!css!app/styles/SwipeViews.css');
+require('style!css!app/styles/lifestyle.css');
 
-// App css
-//require('style!css!sass');
-
-
+var tabMapper = {
+    "0": "47",
+    "1": "48",
+    "2": "49"
+};
 var WeatherParent = React.createClass({
 
     getInitialState: function() {
-        return {temperature: 0.0}
+        return {temperature: 0.0,tabsJson : [{"id":47,"data":[]},{"id":48,"data":[]},{"id":49,"data":[]} ]}
+    },
+    getJsonOnCategoryId: function (id) {
+        var json = this.state.tabsJson.filter(function(object, i){
+                return object.id == id;
+        });
+        return json;
+    },
+    isNetworkCallRequired: function (id) {
+        var object = this.getJsonOnCategoryId(id);
+        console.log(object.length);
+        if(object.length > 0 && object[0].data.length == 0){
+            return true;
+        }else {
+            return false;
+        }
     },
 
-    getjson : function(abc) {
-
+    onTabClick: function(id){
+        // Change the Tab Number 0 to 47 , 1 to 48 etc
+        var id = tabMapper[id];
         var that = this;
-
-        // var weatherJson = '{"coord":{"lon":139,"lat":35},"sys":{"country":"JP","sunrise":1369769524,"sunset":1369821049},"weather":[{"id":804,"main":"clouds","description":"overcast clouds","icon":"04n"}],"main":{"temp":289.5,"humidity":89,"pressure":1013,"temp_min":287.04,"temp_max":292.04},"wind":{"speed":7.31,"deg":187.002},"rain":{"3h":0},"clouds":{"all":92},"dt":1369824698,"id":1851632,"name":"Shuzenji","cod":200}';
-        axios.get('http://api.openweathermap.org/data/2.5/weather?appid=fd8e51a8a23d22e2f1fb6733ff473fcd&q='+abc+",in")
-            .then(function (response) {
-                console.log(response);
-                var temperature = response.data.main.temp;
-                 that.setState({temperature: temperature});
-               // that.setStateFromInner({temperature: temperature});
-            })
-            .catch(function (response) {
-                console.log(response);
-                alert("error " + response);
-            });
-
-        // return weatherJson;
+        var url = UTILS.getNetworkUrl(id);
+        if(this.isNetworkCallRequired(id)) {
+            alert('data not present making network call' + id);
+            axios.get(url, {
+                    headers: {
+                        'X-AKOSHA-AUTH': 'eyJ1c2VyX25hbWUiOm51bGwsImlkIjo0NzU2MjcsIm1vYmlsZSI6Ijk5NzIzNjA2MDYiLCJleHBpcmVzIjoxNzc5MDIwOTg1MDcxfQ==.hheyv5gZTc/sxAoGLiZp/MiDxq8ebwRme0wR4y1bKso=',
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                })
+                .then(function (response) {
+                    console.log(response.data);
+                    alert(response.data);
+                    var tabJsonInfo = that.state.tabsJson;
+                    if(id == 47) {
+                        tabJsonInfo[0].data = response.data;
+                    }else if (id == 48) {
+                        tabJsonInfo[1].data = response.data;
+                    }
+                    that.setState({tabsJson: tabJsonInfo});
+                })
+                .catch(function (response) {
+                    console.log(response);
+                    alert("error " + response);
+                });
+        }else {
+            alert('data already exist in state variable ' + id);
+        }
     },
-    setStateFromInner: function(obj){
-        this.setState(obj);
-    },
-    search: function(city)
-    {
-        //var city = this.refs.city.value;
-        this.getjson(city);
-
-        //alert(temperature);
-//            document.getElementById("weatherReport").innerHTML= "The Temperature is "+temperature;
-        // <WeatherDisplay temperatueProp='24' ></WeatherDisplay>¬
-    },
-
     render: function()
     {
-
         return(
             <div>
-                <WeatherForm onClickForm={this.search}/>
-                <WeatherDisplay temperatureProp={this.state.temperature} />
-
+                <TABS onTabClick={this.onTabClick} tabsJson={this.state.tabsJson} />
             </div>
         );
-
-
     }
 
 });

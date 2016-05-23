@@ -37,7 +37,8 @@ module.exports = {
 	resolve: {
 		root: __dirname,
 		alias: {
-			applicationStyles: 'app/styles/app.scss'
+			applicationStyles: 'app/styles/app.scss',
+			reactswipe: 'app/styles/SwipeViews.css'
 		},
 		
 		extensions: ['', '.jsx', '.js' ]
