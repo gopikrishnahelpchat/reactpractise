@@ -149,3 +149,55 @@ app.get('/lifestylejson', function (req, res) {
   }
   res.send(data);
 });
+
+app.get('/paginationJson', function (req, res) {
+  var categoryId = req.param('category_id');
+  var lastItemId = req.param('item_id');
+  var paginationItems = [{
+    "id": 1000,
+    "category_id": categoryId,
+    "category_name": "Sam's Corner",
+    "source_type": null,
+    "title": "Pagination 1",
+    "updated_time": "20 hours ago",
+    "description": "The former fast bowler came in third, losing to the state health minister by a margin of 11,747 votes.",
+    "image_url": "https://s3-ap-southeast-1.amazonaws.com/helpchat/feed/news/news_notification_images/935423_resized_X.jpg",
+    "source": {
+      "name": "scroll.in",
+      "icon": null,
+      "location": null,
+      "subscriber": null,
+      "url": "http://scroll.in/latest/808417/kerala-polls-bjp-candidate-s-sreesanth-loses-to-congress-vs-sivakumar-in-thiruvananthapuram?utm_content=buffer7f886&utm_medium=social&utm_source=twitter.com&utm_campaign"
+    },
+    "aspect_ratio": 50,
+    "share_text": "http://scroll.in/latest/808417/kerala-polls-bjp-candidate-s-sreesanth-loses-to-congress-vs-sivakumar-in-thiruvananthapuram?utm_content=buffer7f886&utm_medium=social&utm_source=twitter.com&utm_campaign\n- sent via Helpchat",
+    "fb_shares": "12",
+    "tag": null,
+    "views": "226 views"
+  },
+    {
+      "id": 1001,
+      "category_id": categoryId,
+      "category_name": "Sam's Corner",
+      "source_type": null,
+      "title": "Pagination 2",
+      "updated_time": "19 hours ago",
+      "description": "The party contested 60 seats and won 12, as opposed to the 18 it won in the 2011 state polls.",
+      "image_url": "https://s3-ap-southeast-1.amazonaws.com/helpchat/feed/news/news_notification_images/935422_resized_X.jpg",
+      "source": {
+        "name": "scroll.in",
+        "icon": null,
+        "location": null,
+        "subscriber": null,
+        "url": "http://scroll.in/latest/808410/assam-aiudf-chief-badruddin-ajmal-loses-salmara-south-constituency-to-congress?utm_content=buffer66cd8&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer"
+      },
+      "aspect_ratio": 50,
+      "share_text": "http://scroll.in/latest/808410/assam-aiudf-chief-badruddin-ajmal-loses-salmara-south-constituency-to-congress?utm_content=buffer66cd8&utm_medium=social&utm_source=twitter.com&utm_campaign=buffer\n- sent via Helpchat",
+      "fb_shares": "10",
+      "tag": null,
+      "views": "632 views"
+    }];
+  res.send(paginationItems);
+
+});
+

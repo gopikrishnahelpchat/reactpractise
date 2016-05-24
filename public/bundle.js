@@ -26133,24 +26133,30 @@
 	var React = __webpack_require__(7);
 	var ReactDOM = __webpack_require__(39);
 	var axios = __webpack_require__(247);
-	var TABS = __webpack_require__(267);
-	var UTILS = __webpack_require__(276);
+	var TABS = __webpack_require__(265);
+	var UTILS = __webpack_require__(269);
 
 	__webpack_require__(235);
-	__webpack_require__(268);
 	__webpack_require__(270);
+	__webpack_require__(272);
 
 	var tabMapper = {
 	    "0": "47",
 	    "1": "48",
 	    "2": "49"
 	};
+	var categoryTabMapper = {
+	    "47": "0",
+	    "48": "1",
+	    "49": "2"
+	};
 	var WeatherParent = React.createClass({
 	    displayName: 'WeatherParent',
 
 
+	    // Tab 0 is first tab ...
 	    getInitialState: function getInitialState() {
-	        return { temperature: 0.0, tabsJson: [{ "id": 47, "data": [] }, { "id": 48, "data": [] }, { "id": 49, "data": [] }] };
+	        return { currentTab: 0, tabsJson: [{ "id": 47, "data": [] }, { "id": 48, "data": [] }, { "id": 49, "data": [] }] };
 	    },
 	    getJsonOnCategoryId: function getJsonOnCategoryId(id) {
 	        var json = this.state.tabsJson.filter(function (object, i) {
@@ -26167,14 +26173,19 @@
 	            return false;
 	        }
 	    },
+	    getTabIndexFromCategory: function getTabIndexFromCategory(categoryId) {
+	        var tabIndex = categoryTabMapper[categoryId];
+	        return tabIndex;
+	    },
 
 	    onTabClick: function onTabClick(id) {
 	        // Change the Tab Number 0 to 47 , 1 to 48 etc
+	        this.setState({ currentTab: id });
 	        var id = tabMapper[id];
 	        var that = this;
 	        var url = UTILS.getNetworkUrl(id);
 	        if (this.isNetworkCallRequired(id)) {
-	            alert('data not present making network call' + id);
+	            alert('data not present making network call for Tab ' + id);
 	            axios.get(url, {
 	                headers: {
 	                    'X-AKOSHA-AUTH': 'eyJ1c2VyX25hbWUiOm51bGwsImlkIjo0NzU2MjcsIm1vYmlsZSI6Ijk5NzIzNjA2MDYiLCJleHBpcmVzIjoxNzc5MDIwOTg1MDcxfQ==.hheyv5gZTc/sxAoGLiZp/MiDxq8ebwRme0wR4y1bKso=',
@@ -26184,10 +26195,9 @@
 	                console.log(response.data);
 	                alert(response.data);
 	                var tabJsonInfo = that.state.tabsJson;
-	                if (id == 47) {
-	                    tabJsonInfo[0].data = response.data;
-	                } else if (id == 48) {
-	                    tabJsonInfo[1].data = response.data;
+	                var tabIndexFromCategory = that.getTabIndexFromCategory(id);
+	                if (tabIndexFromCategory >= 0 && tabIndexFromCategory < tabJsonInfo.length) {
+	                    tabJsonInfo[tabIndexFromCategory].data = response.data;
 	                }
 	                that.setState({ tabsJson: tabJsonInfo });
 	            }).catch(function (response) {
@@ -26195,7 +26205,30 @@
 	                alert("error " + response);
 	            });
 	        } else {
-	            alert('data already exist in state variable ' + id);
+	            alert('data already exist for tab ' + id);
+	        }
+	    },
+	    onScrollEnd: function onScrollEnd(articleId) {
+	        that = this;
+	        if (articleId != null) {
+	            axios.get("http://localhost:3000/paginationJson?categoryId=" + this.state.currentTab + "&articleId=" + articleId, {
+	                headers: {
+	                    'X-AKOSHA-AUTH': 'eyJ1c2VyX25hbWUiOm51bGwsImlkIjo0NzU2MjcsIm1vYmlsZSI6Ijk5NzIzNjA2MDYiLCJleHBpcmVzIjoxNzc5MDIwOTg1MDcxfQ==.hheyv5gZTc/sxAoGLiZp/MiDxq8ebwRme0wR4y1bKso=',
+	                    'Access-Control-Allow-Origin': '*'
+	                }
+	            }).then(function (response) {
+	                console.log(response.data);
+	                alert(response.data);
+	                var tabJsonInfo = that.state.tabsJson;
+	                tabJsonInfo[that.state.currentTab].data.push(response.data);
+
+	                that.setState({ tabsJson: tabJsonInfo });
+	            }).catch(function (response) {
+	                console.log(response);
+	                alert("error " + response);
+	            });
+	        } else {
+	            alert('invalid articleId ' + articleId);
 	        }
 	    },
 	    render: function render() {
@@ -27384,16 +27417,14 @@
 
 
 /***/ },
-/* 265 */,
-/* 266 */,
-/* 267 */
+/* 265 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(7);
-	var SwipeViews = __webpack_require__(272);
-	var LifeStyle = __webpack_require__(273);
+	var SwipeViews = __webpack_require__(266);
+	var LifeStyle = __webpack_require__(267);
 
 	var TABS = React.createClass({
 	    displayName: 'TABS',
@@ -27442,87 +27473,7 @@
 	module.exports = TABS;
 
 /***/ },
-/* 268 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(269);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(243)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./SwipeViews.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./SwipeViews.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 269 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(237)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "\n.SwipeViewsContainer {\n  height: 100%;\n  display: flex;\n  flex-flow: column nowrap;\n  overflow: hidden;\n}\n\n.SwipeViewsHeader {\n  min-height: 40px;\n  border-bottom: #F0F0F0 4px solid;\n  display: flex;\n  flex-flow: row nowrap;\n}\n\n.SwipeViewsTabs {\n  flex: 1;\n  min-height: 100%;\n  display: flex;\n  flex-flow: column nowrap;\n  margin-bottom: -4px;\n}\n\n.SwipeViewsTabs > ul {\n  flex: 1;\n  display: flex;\n  flex-flow: row nowrap;\n  margin: 0;\n  padding: 0;\n}\n\n.SwipeViewsTab {\n  display: inline;\n  padding-top: 15px;\n  flex: 1;\n  text-align: center;\n  cursor: pointer;\n}\n\n.SwipeViewsTab > a {\n  text-decoration: none;\n  color: black;\n  width: 100%;\n  height: 100%;\n  display: block;\n}\n\n.SwipeViewsTabs .active {\n  color: #FF6950;\n}\n\n.SwipeViewsInk {\n  transition-duration: 0.2s;\n  transition-timing-function: ease-in-out;\n  height: 4px;\n  background-color: #FF6950;\n  border-radius: 5px;\n}\n\n.SwipeViews {\n  transition-duration: 0.2s;\n  transition-timing-function: ease-in-out;\n  height: 100%;\n  display: flex;\n  flex-flow: row nowrap;\n  overflow-x: hidden;\n}\n\n.SwipeView {\n  overflow-y: scroll;\n}\n", ""]);
-
-	// exports
-
-
-/***/ },
-/* 270 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// style-loader: Adds some css to the DOM by adding a <style> tag
-
-	// load the styles
-	var content = __webpack_require__(271);
-	if(typeof content === 'string') content = [[module.id, content, '']];
-	// add the styles to the DOM
-	var update = __webpack_require__(243)(content, {});
-	if(content.locals) module.exports = content.locals;
-	// Hot Module Replacement
-	if(false) {
-		// When the styles change, update the <style> tags
-		if(!content.locals) {
-			module.hot.accept("!!./../../node_modules/css-loader/index.js!./lifestyle.css", function() {
-				var newContent = require("!!./../../node_modules/css-loader/index.js!./lifestyle.css");
-				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-				update(newContent);
-			});
-		}
-		// When the module is disposed, remove the <style> tags
-		module.hot.dispose(function() { update(); });
-	}
-
-/***/ },
-/* 271 */
-/***/ function(module, exports, __webpack_require__) {
-
-	exports = module.exports = __webpack_require__(237)();
-	// imports
-
-
-	// module
-	exports.push([module.id, "body, .container-fluid { overflow: hidden;}\n/*.tab-pane*/\n/*{*/\n/*overflow-y: scroll;*/\n/**/\n/*}*/\n\n\n.slider-slide h3 {\n    color: #fff;\n    margin-top: 10px;\n}\n\n.scroll {\n    height: 100%;\n}\n\n.tabbed-slidebox .tsb-icons:after {\n    display: none;\n}\n\n.content {\n    margin: auto;\n    max-width: 600px !important;\n    border-width: 1px;\n    box-shadow: 0px 1px 3px #959C9B;\n    background: white;\n    border-radius: 2px;\n    text-align: -webkit-left;\n}\n\n/*.item {*/\n/*overflow: auto;*/\n/*padding: 0px;*/\n/*}*/\n\n.authorImage {\n    border-radius: 100%;\n    border: 5px solid white;\n    margin-left: 5px;\n    margin-top: 5px;\n    width: 40px;\n    height: 40px;\n}\n\n.sourceLogo {\n    z-index: 3;\n    height: 18px;\n    width: 18px;\n    margin-left: -15px;\n    margin-top: 25px;\n}\n\n.instaLogo {\n    height: 10px;\n    width: 13px;\n    padding-left: 10px;\n}\n\n.authorName {\n    display: flex;\n    align-items: center;\n    color: #125689;\n    font-weight: 600;\n    font-size: medium;\n    padding-left: 5px;\n    font-family: Helvetica;\n    overflow: auto;\n    flex-wrap: wrap;\n    flex: 0 1 100%;\n}\n\n.description {\n    color: #212121;\n    padding-right: 10px;\n    font-weight: 200;\n    line-height: normal;\n    display: -webkit-box;\n    white-space: normal;\n    -webkit-line-clamp: 4;\n    -webkit-box-orient: vertical;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    padding-left:10px;\n}\n\n.insta-image {\n    padding-top: 5px;\n    width: 100%;\n    /*height: 50%;*/\n}\n\n.section {\n    padding: 0px;\n}\n\ndiv.play-button {\n    height: 72px;\n    width: 72px;\n    left: 50%;\n    top: 50%;\n    margin-left: -36px;\n    margin-top: -36px;\n    position: absolute;\n    background: url(\"/feed/webforms/img/play_button.png\") no-repeat;\n}\n\n.video-player {\n    position: relative;\n    padding-bottom: 56.25%;\n    padding-top: 30px;\n    height: 0;\n    overflow: hidden;\n}\n\n.video-player iframe, .video-container object, .video-container embed {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n}\n\n.publishTime {\n    color: #b0b3b6;\n    float: right;\n    padding-right: 10px;\n    margin-top:10px;\n    display: flex;\n    align-items: center;\n    font-size: 13px;\n    font-weight: 200;\n}\n\n@-webkit-keyframes placeHolderShimmer {\n    0% {\n        background-position: -468px 0\n    }\n    100% {\n        background-position: 468px 0\n    }\n}\n\n@keyframes placeHolderShimmer {\n    0% {\n        background-position: -468px 0\n    }\n    100% {\n        background-position: 468px 0\n    }\n}\n\n.timeline-wrapper {\n    background-color: #e9eaed;\n    color: #141823;\n    padding: 0px;\n    border: 1px solid #ccc;\n}\n\n.timeline-item {\n    background: #fff;\n    border: 1px solid;\n    border-color: #e5e6e9 #dfe0e4 #d0d1d5;\n    border-radius: 3px;\n    padding: 12px;\n    margin: 0 auto;\n    max-width: 472px;\n    min-height: 200px;\n}\n\n.animated-background {\n    -webkit-animation-duration: 1s;\n    animation-duration: 1s;\n    -webkit-animation-fill-mode: forwards;\n    animation-fill-mode: forwards;\n    -webkit-animation-iteration-count: infinite;\n    animation-iteration-count: infinite;\n    -webkit-animation-name: placeHolderShimmer;\n    animation-name: placeHolderShimmer;\n    -webkit-animation-timing-function: linear;\n    animation-timing-function: linear;\n    background: #f6f7f8;\n    background: #eeeeee;\n    background: -webkit-gradient(linear, left top, right top, color-stop(8%, #eeeeee), color-stop(18%, #dddddd), color-stop(33%, #eeeeee));\n    background: -webkit-linear-gradient(left, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);\n    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);\n    -webkit-background-size: 800px 104px;\n    background-size: 800px 104px;\n    height: 400px;\n    position: relative;\n}\n\n.background-masker {\n    background: #fff;\n    position: absolute;\n    -webkit-box-sizing: border-box;\n    -moz-box-sizing: border-box;\n    box-sizing: border-box;\n}\n\n.outlined .background-masker {\n    border: 1px solid #ddd;\n}\n\n.outlined:hover .background-masker {\n    border: none;\n}\n\n.outlined:hover .background-masker:hover {\n    border: 1px solid #ccc;\n    z-index: 1;\n}\n\n.background-masker.header-top {\n    top: 0;\n    left: 40px;\n    right: 0;\n    height: 10px;\n}\n\n.background-masker.header-left,\n.background-masker.header-right {\n    top: 10px;\n    left: 40px;\n    height: 20px;\n    width: 10px;\n}\n\n.background-masker.header-bottom {\n    top: 30px;\n    right: 0;\n    left: 40px;\n    height: 30px;\n}\n\n.background-masker.header-right {\n    width: auto;\n    left: 300px;\n    right: 20px;\n}\n\n.background-masker.content-top,\n.background-masker.content-bottom,\n.background-masker.content-description {\n    top: 40px;\n    left: 0;\n    right: 0;\n    height: 20px;\n}\n\n.background-masker.content-description {\n    top: 100px;\n}\n\n.background-masker.content-bottom {\n    top: 360px;\n}\n\n.background-masker.footer {\n    top: 380px;\n    left: 70px;\n    height: 20px;\n    width: auto;\n    right: 50px;\n}\n\n.wrapper {\n    position:relative;\n    margin:0 auto;\n    overflow-y:hidden;\n    overflow-x: scroll;\n    padding:5px;\n    height:6vh;\n    max-height: 6vh;\n}\n\n.list {\n    left:0px;\n    top:0px;\n    min-width:900px;\n    /*margin-left:12px;*/\n    margin-top:0px;\n    background-color: #60379E;\n}\n\n.list li{\n    display:table-cell;\n    position:relative;\n    text-align:center;\n    cursor:grab;\n    cursor:-webkit-grab;\n    color:#efefef;\n    vertical-align:middle;\n    background-color:#60379E;\n}\n\n.scroller {\n    text-align:center;\n    cursor:pointer;\n    display:none;\n    padding:7px;\n    padding-top:11px;\n    white-space:no-wrap;\n    vertical-align:middle;\n    background-color:#fff;\n}\n\n.scroller-right{\n    float:right;\n}\n\n.scroller-left {\n    float:left;\n}\n\n.nav > li > a\n{\n    color:white;\n}\n\n.item {\n    background-color: #fff;\n    color: #444;\n    position: relative;\n    z-index: 2;\n    display: block;\n    margin: -1px;\n    /*padding: 16px;*/\n    padding-bottom:2px;\n    padding-top: 5px;\n    font-size: 16px;\n    margin-bottom:10px;\n}\n\n/*@media (max-width: 978px) {*/\n/*.container-fluid {*/\n/*padding:0;*/\n/*margin:0;*/\n/*}*/\n\n/*body {*/\n/*padding:0;*/\n/*}*/\n\n/*.navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {*/\n/*margin-left: 0;*/\n/*margin-right: 0;*/\n/*margin-bottom:0;*/\n/*}*/\n/*}*/\n\n\n.nav-tabs > li > a:hover {\n    border-color:transparent;\n}\n.nav > li > a:hover, .nav > li > a:focus {\n    text-decoration: none;\n    background-color: transparent;\n}\n\n.tab-pane{\n    overflow-y: auto !important;\n    max-height: 100vh;\n    padding-bottom: 40px;\n    overflow-x: hidden;\n    -webkit-overflow-scrolling: touch;\n}\n.row{\n    margin-left: 0px !important;\n    margin-right: 0px !important;\n}\n.container-fluid{\n    padding:0px !important;\n    margin: 0px !important;\n    height: 94vh;\n}\n.navbar-fixed-top{\n    position: absolute !important;\n}\n::-webkit-scrollbar {\n    display: none;\n}\n/*.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus{\n    transition: all .3s ease-in;\n    -o-transition: all .3s ease-in;\n    -webkit-transition: all .3s ease-in;\n    -moz-transition: all .3s ease-in;\n}*/\nvideo::-webkit-media-controls-fullscreen-button {\n    display: none;\n}\n\n.youtube-play {\n    padding-top: 5px;\n    width: 100%;\n    height: 50%;\n}\n\n.card {\n    box-shadow: 1px 4px 4px #BBB;\n}\n\n.nav-tabs > li > a\n{\n    border-radius: 0 0 0 0;\n}\n\nhr {\n    margin-bottom: 0px;\n}", ""]);
-
-	// exports
-
-
-/***/ },
-/* 272 */
+/* 266 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -27789,13 +27740,13 @@
 
 
 /***/ },
-/* 273 */
+/* 267 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	var React = __webpack_require__(7);
-	var LifeStyleItemNew = __webpack_require__(275);
+	var LifeStyleItemNew = __webpack_require__(268);
 	var axios = __webpack_require__(247);
 
 	var LifeStyleParent = React.createClass({
@@ -27826,8 +27777,7 @@
 	module.exports = LifeStyleParent;
 
 /***/ },
-/* 274 */,
-/* 275 */
+/* 268 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -27927,7 +27877,7 @@
 	module.exports = LifeStyleItemNew;
 
 /***/ },
-/* 276 */
+/* 269 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -27954,6 +27904,86 @@
 	});
 
 	module.exports = Utils;
+
+/***/ },
+/* 270 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(271);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(243)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./SwipeViews.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./SwipeViews.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 271 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(237)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "\n.SwipeViewsContainer {\n  height: 100%;\n  display: flex;\n  flex-flow: column nowrap;\n  overflow: hidden;\n}\n\n.SwipeViewsHeader {\n  min-height: 40px;\n  border-bottom: #F0F0F0 4px solid;\n  display: flex;\n  flex-flow: row nowrap;\n}\n\n.SwipeViewsTabs {\n  flex: 1;\n  min-height: 100%;\n  display: flex;\n  flex-flow: column nowrap;\n  margin-bottom: -4px;\n}\n\n.SwipeViewsTabs > ul {\n  flex: 1;\n  display: flex;\n  flex-flow: row nowrap;\n  margin: 0;\n  padding: 0;\n}\n\n.SwipeViewsTab {\n  display: inline;\n  padding-top: 15px;\n  flex: 1;\n  text-align: center;\n  cursor: pointer;\n}\n\n.SwipeViewsTab > a {\n  text-decoration: none;\n  color: black;\n  width: 100%;\n  height: 100%;\n  display: block;\n}\n\n.SwipeViewsTabs .active {\n  color: #FF6950;\n}\n\n.SwipeViewsInk {\n  transition-duration: 0.2s;\n  transition-timing-function: ease-in-out;\n  height: 4px;\n  background-color: #FF6950;\n  border-radius: 5px;\n}\n\n.SwipeViews {\n  transition-duration: 0.2s;\n  transition-timing-function: ease-in-out;\n  height: 100%;\n  display: flex;\n  flex-flow: row nowrap;\n  overflow-x: hidden;\n}\n\n.SwipeView {\n  overflow-y: scroll;\n}\n", ""]);
+
+	// exports
+
+
+/***/ },
+/* 272 */
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+
+	// load the styles
+	var content = __webpack_require__(273);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(243)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!./../../node_modules/css-loader/index.js!./lifestyle.css", function() {
+				var newContent = require("!!./../../node_modules/css-loader/index.js!./lifestyle.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 273 */
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(237)();
+	// imports
+
+
+	// module
+	exports.push([module.id, "body, .container-fluid { overflow: hidden;}\n/*.tab-pane*/\n/*{*/\n/*overflow-y: scroll;*/\n/**/\n/*}*/\n\n\n.slider-slide h3 {\n    color: #fff;\n    margin-top: 10px;\n}\n\n.scroll {\n    height: 100%;\n}\n\n.tabbed-slidebox .tsb-icons:after {\n    display: none;\n}\n\n.content {\n    margin: auto;\n    max-width: 600px !important;\n    border-width: 1px;\n    box-shadow: 0px 1px 3px #959C9B;\n    background: white;\n    border-radius: 2px;\n    text-align: -webkit-left;\n}\n\n/*.item {*/\n/*overflow: auto;*/\n/*padding: 0px;*/\n/*}*/\n\n.authorImage {\n    border-radius: 100%;\n    border: 5px solid white;\n    margin-left: 5px;\n    margin-top: 5px;\n    width: 40px;\n    height: 40px;\n}\n\n.sourceLogo {\n    z-index: 3;\n    height: 18px;\n    width: 18px;\n    margin-left: -15px;\n    margin-top: 25px;\n}\n\n.instaLogo {\n    height: 10px;\n    width: 13px;\n    padding-left: 10px;\n}\n\n.authorName {\n    display: flex;\n    align-items: center;\n    color: #125689;\n    font-weight: 600;\n    font-size: medium;\n    padding-left: 5px;\n    font-family: Helvetica;\n    overflow: auto;\n    flex-wrap: wrap;\n    flex: 0 1 100%;\n}\n\n.description {\n    color: #212121;\n    padding-right: 10px;\n    font-weight: 200;\n    line-height: normal;\n    display: -webkit-box;\n    white-space: normal;\n    -webkit-line-clamp: 4;\n    -webkit-box-orient: vertical;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    padding-left:10px;\n}\n\n.insta-image {\n    padding-top: 5px;\n    width: 100%;\n    /*height: 50%;*/\n}\n\n.section {\n    padding: 0px;\n}\n\ndiv.play-button {\n    height: 72px;\n    width: 72px;\n    left: 50%;\n    top: 50%;\n    margin-left: -36px;\n    margin-top: -36px;\n    position: absolute;\n    background: url(\"/feed/webforms/img/play_button.png\") no-repeat;\n}\n\n.video-player {\n    position: relative;\n    padding-bottom: 56.25%;\n    padding-top: 30px;\n    height: 0;\n    overflow: hidden;\n}\n\n.video-player iframe, .video-container object, .video-container embed {\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100%;\n    height: 100%;\n}\n\n.publishTime {\n    color: #b0b3b6;\n    float: right;\n    padding-right: 10px;\n    margin-top:10px;\n    display: flex;\n    align-items: center;\n    font-size: 13px;\n    font-weight: 200;\n}\n\n@-webkit-keyframes placeHolderShimmer {\n    0% {\n        background-position: -468px 0\n    }\n    100% {\n        background-position: 468px 0\n    }\n}\n\n@keyframes placeHolderShimmer {\n    0% {\n        background-position: -468px 0\n    }\n    100% {\n        background-position: 468px 0\n    }\n}\n\n.timeline-wrapper {\n    background-color: #e9eaed;\n    color: #141823;\n    padding: 0px;\n    border: 1px solid #ccc;\n}\n\n.timeline-item {\n    background: #fff;\n    border: 1px solid;\n    border-color: #e5e6e9 #dfe0e4 #d0d1d5;\n    border-radius: 3px;\n    padding: 12px;\n    margin: 0 auto;\n    max-width: 472px;\n    min-height: 200px;\n}\n\n.animated-background {\n    -webkit-animation-duration: 1s;\n    animation-duration: 1s;\n    -webkit-animation-fill-mode: forwards;\n    animation-fill-mode: forwards;\n    -webkit-animation-iteration-count: infinite;\n    animation-iteration-count: infinite;\n    -webkit-animation-name: placeHolderShimmer;\n    animation-name: placeHolderShimmer;\n    -webkit-animation-timing-function: linear;\n    animation-timing-function: linear;\n    background: #f6f7f8;\n    background: #eeeeee;\n    background: -webkit-gradient(linear, left top, right top, color-stop(8%, #eeeeee), color-stop(18%, #dddddd), color-stop(33%, #eeeeee));\n    background: -webkit-linear-gradient(left, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);\n    background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);\n    -webkit-background-size: 800px 104px;\n    background-size: 800px 104px;\n    height: 400px;\n    position: relative;\n}\n\n.background-masker {\n    background: #fff;\n    position: absolute;\n    -webkit-box-sizing: border-box;\n    -moz-box-sizing: border-box;\n    box-sizing: border-box;\n}\n\n.outlined .background-masker {\n    border: 1px solid #ddd;\n}\n\n.outlined:hover .background-masker {\n    border: none;\n}\n\n.outlined:hover .background-masker:hover {\n    border: 1px solid #ccc;\n    z-index: 1;\n}\n\n.background-masker.header-top {\n    top: 0;\n    left: 40px;\n    right: 0;\n    height: 10px;\n}\n\n.background-masker.header-left,\n.background-masker.header-right {\n    top: 10px;\n    left: 40px;\n    height: 20px;\n    width: 10px;\n}\n\n.background-masker.header-bottom {\n    top: 30px;\n    right: 0;\n    left: 40px;\n    height: 30px;\n}\n\n.background-masker.header-right {\n    width: auto;\n    left: 300px;\n    right: 20px;\n}\n\n.background-masker.content-top,\n.background-masker.content-bottom,\n.background-masker.content-description {\n    top: 40px;\n    left: 0;\n    right: 0;\n    height: 20px;\n}\n\n.background-masker.content-description {\n    top: 100px;\n}\n\n.background-masker.content-bottom {\n    top: 360px;\n}\n\n.background-masker.footer {\n    top: 380px;\n    left: 70px;\n    height: 20px;\n    width: auto;\n    right: 50px;\n}\n\n.wrapper {\n    position:relative;\n    margin:0 auto;\n    overflow-y:hidden;\n    overflow-x: scroll;\n    padding:5px;\n    height:6vh;\n    max-height: 6vh;\n}\n\n.list {\n    left:0px;\n    top:0px;\n    min-width:900px;\n    /*margin-left:12px;*/\n    margin-top:0px;\n    background-color: #60379E;\n}\n\n.list li{\n    display:table-cell;\n    position:relative;\n    text-align:center;\n    cursor:grab;\n    cursor:-webkit-grab;\n    color:#efefef;\n    vertical-align:middle;\n    background-color:#60379E;\n}\n\n.scroller {\n    text-align:center;\n    cursor:pointer;\n    display:none;\n    padding:7px;\n    padding-top:11px;\n    white-space:no-wrap;\n    vertical-align:middle;\n    background-color:#fff;\n}\n\n.scroller-right{\n    float:right;\n}\n\n.scroller-left {\n    float:left;\n}\n\n.nav > li > a\n{\n    color:white;\n}\n\n.item {\n    background-color: #fff;\n    color: #444;\n    position: relative;\n    z-index: 2;\n    display: block;\n    margin: -1px;\n    /*padding: 16px;*/\n    padding-bottom:2px;\n    padding-top: 5px;\n    font-size: 16px;\n    margin-bottom:10px;\n}\n\n/*@media (max-width: 978px) {*/\n/*.container-fluid {*/\n/*padding:0;*/\n/*margin:0;*/\n/*}*/\n\n/*body {*/\n/*padding:0;*/\n/*}*/\n\n/*.navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {*/\n/*margin-left: 0;*/\n/*margin-right: 0;*/\n/*margin-bottom:0;*/\n/*}*/\n/*}*/\n\n\n.nav-tabs > li > a:hover {\n    border-color:transparent;\n}\n.nav > li > a:hover, .nav > li > a:focus {\n    text-decoration: none;\n    background-color: transparent;\n}\n\n.tab-pane{\n    overflow-y: auto !important;\n    max-height: 100vh;\n    padding-bottom: 40px;\n    overflow-x: hidden;\n    -webkit-overflow-scrolling: touch;\n}\n.row{\n    margin-left: 0px !important;\n    margin-right: 0px !important;\n}\n.container-fluid{\n    padding:0px !important;\n    margin: 0px !important;\n    height: 94vh;\n}\n.navbar-fixed-top{\n    position: absolute !important;\n}\n::-webkit-scrollbar {\n    display: none;\n}\n/*.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus{\n    transition: all .3s ease-in;\n    -o-transition: all .3s ease-in;\n    -webkit-transition: all .3s ease-in;\n    -moz-transition: all .3s ease-in;\n}*/\nvideo::-webkit-media-controls-fullscreen-button {\n    display: none;\n}\n\n.youtube-play {\n    padding-top: 5px;\n    width: 100%;\n    height: 50%;\n}\n\n.card {\n    box-shadow: 1px 4px 4px #BBB;\n}\n\n.nav-tabs > li > a\n{\n    border-radius: 0 0 0 0;\n}\n\nhr {\n    margin-bottom: 0px;\n}", ""]);
+
+	// exports
+
 
 /***/ }
 /******/ ]);
